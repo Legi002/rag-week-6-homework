@@ -27,7 +27,7 @@ def build_grounded_answer(question: str, chunks: list[Chunk], top_k: int = 2) ->
     citations = []
     for item in results:
         citations.append(item.chunk.chunk_id)
-        supporting_points.append(f"[{item.chunk.chunk_id}] {item.chunk.text}")
+        supporting_points.append(f"[{item.chunk.chunk_id}] {item.chunk.answer_text or item.chunk.text}")
 
     answer = "Grounded response based on retrieved context:\n" + "\n".join(supporting_points)
     return RagAnswer(answer=answer, citations=citations, refused=False)

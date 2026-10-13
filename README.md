@@ -59,6 +59,7 @@ pip install -r requirements.txt
 python -m src.cli --question "What is retrieval augmented generation?"
 python -m src.cli --question "Who won the world cup in 1958?"
 python -m src.cli --corpus-profile training-rag --question "Why are citations important in RAG?"
+python -m src.cli --corpus-profile training-rag --question "Why are citations important in RAG?" --show-retrieval
 ```
 
 ## Corpus profiles
@@ -99,3 +100,4 @@ Use this exact structure for easy review:
   - Unsupported case command + output
 
 Use `docs/homework-checklist.md` as submission guidance.
+Use `--show-retrieval` to inspect ranked chunk IDs, scores, source titles, and text. Record the five homework outcomes and reproducible command output in the root `evidence.md` file.
