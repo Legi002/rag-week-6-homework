@@ -101,3 +101,24 @@ Use this exact structure for easy review:
 
 Use `docs/homework-checklist.md` as submission guidance.
 Use `--show-retrieval` to inspect ranked chunk IDs, scores, source titles, and text. Record the five homework outcomes and reproducible command output in the root `evidence.md` file.
+
+## Optional local Prince corpus
+
+The extension can search the English W. K. Marriott edition of *The Prince* (Project Gutenberg ebook 1232). Obtain the plain-text book manually from the [official ebook page](https://www.gutenberg.org/ebooks/1232) or [plain-text file](https://www.gutenberg.org/cache/epub/1232/pg1232.txt), then keep it outside this repository. The CLI works locally and does not download the book.
+
+Only the researched edition updated July 24, 2026 is accepted. Its canonical source SHA-256 is `948dcf754b809ad1164d0f3bb2113e3bb340a1cf5ad6ddb7e8b55610aa318368`. A newer or edited copy needs a reviewed manifest and evaluation update.
+
+On Windows PowerShell, point acceptance tests at your downloaded copy:
+
+```powershell
+$env:RAG_PRINCE_FILE = 'C:\path\to\pg1232.txt'
+python -m src.cli --corpus-file $env:RAG_PRINCE_FILE --question "What were the five errors of Louis?" --chunk-size 800 --overlap 120 --top-k 3 --show-retrieval
+python -m src.cli --corpus-file $env:RAG_PRINCE_FILE --question "Is it safer to be feared than loved?"
+python -m src.cli --corpus-file $env:RAG_PRINCE_FILE --question "Why are mercenaries useless and dangerous?"
+python -m src.cli --corpus-file $env:RAG_PRINCE_FILE --question "When was Nicolo Machiavelli born?"
+python -m pytest -q
+```
+
+Book defaults are 800 characters, 120 overlap and top-k 2. Use 400/80 to compare the second planned configuration. `--show-retrieval` displays raw BM25 candidates separately from complete sentences admitted for quotation. BM25 scores rank passages; they are not answer confidence. Every citation points to an exact source sentence and its offsets.
+
+The local quote policy favors traceable evidence over broad recall. It can refuse valid paraphrases such as `What five errors did Louis XII make in Italy?`, cannot combine evidence across sentences, and does not prove that a refused question has no answer in the book. Passing its lexical gates also does not guarantee arbitrary semantic correctness. See `specs/001-prince-book-rag/validation.md` and `evidence-prince.md` for the fixed cases and measured implementation results.
