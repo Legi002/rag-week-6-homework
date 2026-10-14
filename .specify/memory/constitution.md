@@ -1,50 +1,40 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# RAG Week 6 Homework Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Trace quotations to actual evidence
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Answers MUST distinguish source quotation from generated inference. Every quotation MUST identify its corpus and supporting source location. Refusal MUST occur when the selected evidence policy does not admit support; a refusal MUST NOT be presented as proof that the corpus contains no possible answer.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Keep source identity explicit
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+External corpus profiles MUST retain source and edition metadata with reproducible content identity. Source parsing MUST validate the supported input format and edition rather than silently assign hard-coded provenance to arbitrary text. A full downloaded corpus MUST NOT be committed as a development fixture.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Keep responsibilities and scope explicit
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Corpus loading, chunking, ranking, evidence admission and CLI rendering MUST remain separately testable. A dependency or service MUST have a documented learning or functional benefit. The default homework remains local; any future feature needing external services MUST document and justify that choice in its own reviewed plan. The current Prince extension is explicitly fully local and model-free by user choice.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Make claims reproducible
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Evidence MUST record corpus identity, settings, ranked context, citations and refusal behavior. Tests MUST cover observable requirements, including negative cases. Planning experiments MUST be labelled separately from implementation results; unknown or unrun checks MUST NOT be reported as passes.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Preserve completed homework
+
+The baseline is the completed homework at 4c0e2b442bbcaeef1ffe7e1145400f310542112e. Its built-in profiles, public interfaces, default behavior, tests and original evidence MUST remain usable. Optional extension data or configuration MUST NOT be required for baseline commands.
+
+## Additional Constraints
+
+- The repository is a Python command-line learning exercise.
+- Standard-library runtime code is preferred; an added dependency requires a stated reason.
+- pytest is the existing test dependency. Tests use small controlled fixtures, not the full external book.
+- User-provided files are inputs. Synced project reference material remains read-only.
+
+## Development Workflow
+
+Record requirements, a validated design, explicit contracts and acceptance criteria before implementation. Keep source scores separate from evidence sufficiency and test exact citations. Preserve passing baseline checks and record actual feature evidence after code exists. Stop and report conflicting governing documents instead of silently selecting a convenient interpretation.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This is the initial committed project constitution, replacing an unratified template/draft. It is adopted for the extension branch on 2026-10-14. Amendments MUST describe affected behavior and update semantic versioning: incompatible principles require a major version, new guidance a minor version, and clarifications a patch. Feature plans MUST evaluate compliance and document justified exceptions. Do not impose a feature-specific service restriction on all future extensions without a deliberate amendment.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-10-14 | **Last Amended**: 2026-10-14

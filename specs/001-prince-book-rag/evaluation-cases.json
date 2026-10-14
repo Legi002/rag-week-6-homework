@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "source_sha256": "948dcf754b809ad1164d0f3bb2113e3bb340a1cf5ad6ddb7e8b55610aa318368",
+  "policy": "book-evidence-v1",
+  "category_definitions": {"supported": "Required exact source quotation", "negative": "Expected policy refusal; not a claim that the source contains no possible answer", "known_false_refusal": "Answerable paraphrase rejected by literal matching"},
+  "configurations": [{"chunk_size": 400, "overlap": 80}, {"chunk_size": 800, "overlap": 120}],
+  "top_k_values": [2, 3],
+  "cases": [
+    {"case_id": "supported-five", "category": "supported", "question": "What were the five errors of Louis?", "expected_refused": false, "expected_sections": ["chapter-03"], "required_fragments": ["destroyed the minor powers", "increased the strength of one of the greater powers in Italy", "brought in a foreign power", "did not settle in the country", "did not send colonies"]},
+    {"case_id": "supported-feared", "category": "supported", "question": "Is it safer to be feared than loved?", "expected_refused": false, "expected_sections": ["chapter-17"], "required_fragments": ["much safer to be feared than loved", "either must be dispensed with"]},
+    {"case_id": "supported-mercenaries", "category": "supported", "question": "Why are mercenaries useless and dangerous?", "expected_refused": false, "expected_sections": ["chapter-12"], "required_fragments": ["Mercenaries and auxiliaries are useless and dangerous", "disunited, ambitious", "without discipline", "unfaithful"]},
+    {"case_id": "supported-birth", "category": "supported", "question": "When was Nicolo Machiavelli born?", "expected_refused": false, "expected_sections": ["introduction", "editorial-note"], "required_fragments": ["Nicolo Machiavelli", "born at Florence on 3rd May 1469"]},
+    {"case_id": "weather", "category": "negative", "question": "What was the weather in Florence on May 3, 1469?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "weather-ordinal", "category": "negative", "question": "What was the weather in Florence on 3rd May 1469?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "birth-time", "category": "negative", "question": "At what exact time was Nicolo Machiavelli born?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "salary", "category": "negative", "question": "What monthly salary in florins did mercenaries receive?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "temperature", "category": "negative", "question": "What temperature was it when Machiavelli was born in Florence?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "wrong-year", "category": "negative", "question": "Was Nicolo Machiavelli born in Florence in 1527?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "negation", "category": "negative", "question": "Was Nicolo Machiavelli not born in Florence?", "expected_refused": true, "expected_sections": [], "required_fragments": []},
+    {"case_id": "known-false-refusal", "category": "known_false_refusal", "question": "What five errors did Louis XII make in Italy?", "expected_refused": true, "expected_sections": [], "required_fragments": [], "note": "The book contains the answer, but literal matching cannot resolve XII and make/made. This is a documented recall limitation, not evidence that the source lacks the answer."}
+  ]
+}
