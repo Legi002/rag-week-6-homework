@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import re
 from typing import Optional, Tuple
 
-from .book_corpus import BookCorpus, book_sentence_spans
+from .book_corpus import BookCorpus, book_sentence_spans, parser_id_component
 from .rag import REFUSAL_MESSAGE
 from .book_retrieval import (
     BOOK_TOKEN_POLICY_VERSION, K1, B, BookConfigurationError, BookIndex,
@@ -61,8 +61,17 @@ def _count_requests(question: str) -> list:
     found = []
     for index, word in enumerate(words[:-1]):
         count = CARDINALS.get(word)
-        if count is None and word.isdigit() and int(word) > 0:
-            count = int(word)
+        if count is None and word.isdigit():
+            digits = word.lstrip("0")
+            if digits:
+                # A valid list excerpt is limited to 2,000 characters, so a
+                # count with more than four significant digits cannot fit.
+                # Keep it marked as a count request without converting it.
+                count = int(digits) if len(digits) <= 4 else None
+                noun = words[index + 1]
+                if noun.endswith("s") and len(noun) > 1:
+                    found.append((count, noun))
+                continue
         noun = words[index + 1]
         if count is not None and noun.endswith("s") and len(noun) > 1:
             found.append((count, noun))
@@ -113,7 +122,7 @@ def build_book_answer(question: str, book: BookCorpus, index: BookIndex, top_k: 
         return _refused(question, "UNSUPPORTED_HYPOTHETICAL", candidates, book, index, top_k)
 
     count_requests = _count_requests(question)
-    if len(count_requests) > 1:
+    if len(count_requests) > 1 or any(count is None for count, _noun in count_requests):
         return _refused(question, "NO_ADMISSIBLE_SENTENCE", candidates, book, index, top_k)
     wants_why = re.match(r"^\s*why\b", question, re.IGNORECASE) is not None
     wants_when = re.match(r"^\s*when\b", question, re.IGNORECASE) is not None
@@ -151,8 +160,9 @@ def build_book_answer(question: str, book: BookCorpus, index: BookIndex, top_k: 
     excerpts = []
     for (_excerpt_body_hash, start, end), (_origin_key, candidate, section, text) in origins.items():
         section_id = section.section_id
-        excerpt_id = "pg1232-%s-p1-c%d-o%d-%s-s%d-%d" % (
-            book.source_sha256, candidate.chunk.chunk_size, candidate.chunk.overlap, section_id, start, end
+        excerpt_id = "pg1232-%s-%s-c%d-o%d-%s-s%d-%d" % (
+            book.source_sha256, parser_id_component(candidate.chunk.parser_version),
+            candidate.chunk.chunk_size, candidate.chunk.overlap, section_id, start, end
         )
         excerpts.append(EvidenceExcerpt(excerpt_id, section_id, section.heading, section.kind, start, end, text,
                                         1.0, candidate.chunk.chunk_id, candidate.score, ADMISSION_POLICY_VERSION))

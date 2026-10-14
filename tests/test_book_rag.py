@@ -1,3 +1,4 @@
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -118,6 +119,39 @@ def test_exact_quote_citation_and_extended_sentence_location(tmp_path):
     origin = next(chunk for chunk in index.chunks if chunk.chunk_id == excerpt.origin_chunk_id)
     assert origin.start_char > excerpt.start_char or origin.end_char < excerpt.end_char
     assert excerpt.excerpt_id.startswith("pg1232-" + book.source_sha256)
+
+
+def test_parser_version_changes_excerpt_ids_but_repeats_are_stable_and_exact(tmp_path):
+    sentence = "Rarealpha rarebeta appear together in this complete source sentence."
+    book, v1_index = make_book(tmp_path, sentence)
+    v1_answer = build_book_answer("rarealpha rarebeta", book, v1_index, top_k=3)
+    v1_repeat = build_book_answer("rarealpha rarebeta", book, v1_index, top_k=3)
+    v2_book = replace(book, manifest=replace(book.manifest, parser_version="prince-sections-v2"))
+    v2_index = build_book_index(build_book_chunks(v2_book, 400, 80))
+    v2_answer = build_book_answer("rarealpha rarebeta", v2_book, v2_index, top_k=3)
+    v2_repeat = build_book_answer("rarealpha rarebeta", v2_book, v2_index, top_k=3)
+
+    assert not v1_answer.refused and not v2_answer.refused
+    assert "-p1-" in v1_answer.citations[0]
+    assert "-p2-" in v2_answer.citations[0]
+    assert v1_answer.citations != v2_answer.citations
+    assert v1_answer.citations == v1_repeat.citations
+    assert v2_answer.citations == v2_repeat.citations
+    for answer in (v1_answer, v2_answer):
+        excerpt = answer.accepted_excerpts[0]
+        assert excerpt.text == sentence
+        assert book.body_text[excerpt.start_char:excerpt.end_char] == excerpt.text
+
+
+def test_oversized_numeric_count_question_refuses_without_integer_conversion_error(tmp_path):
+    book, index = make_book(tmp_path, "The Prince describes errors carefully.")
+    question = "9" * 5000 + " errors"
+
+    result = build_book_answer(question, book, index)
+
+    assert result.refused
+    assert result.refusal_reason == "NO_ADMISSIBLE_SENTENCE"
+    assert result.citations == ()
 
 
 def test_overlapping_chunks_deduplicate_sentence_and_select_best_origin(tmp_path):

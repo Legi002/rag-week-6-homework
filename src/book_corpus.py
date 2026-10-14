@@ -32,6 +32,14 @@ class BookInputError(ValueError):
     """An actionable local-source or book-configuration error."""
 
 
+def parser_id_component(parser_version: str) -> str:
+    """Return the stable identifier component for a versioned parser name."""
+    match = re.search(r"-v([0-9]+)$", parser_version)
+    if match is None:
+        raise ValueError("parser_version must end with -v followed by a version number")
+    return "p" + match.group(1)
+
+
 @dataclass(frozen=True)
 class BookManifest:
     ebook_id: str

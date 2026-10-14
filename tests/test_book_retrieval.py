@@ -1,4 +1,5 @@
 import math
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,24 @@ def test_book_chunks_are_exact_configured_slices_and_ids_include_configuration(t
     other = build_book_chunks(book, chunk_size=40, overlap=8)
     assert chunks[0].chunk_id != other[0].chunk_id
     assert book.source_sha256 in chunks[0].chunk_id
+
+
+def test_parser_version_changes_chunk_ids_but_repeats_are_stable_and_exact(tmp_path):
+    book = synthetic_book(tmp_path)
+    v1_chunks = build_book_chunks(book, chunk_size=32, overlap=8)
+    v1_repeat = build_book_chunks(book, chunk_size=32, overlap=8)
+    v2_book = replace(book, manifest=replace(book.manifest, parser_version="prince-sections-v2"))
+    v2_chunks = build_book_chunks(v2_book, chunk_size=32, overlap=8)
+    v2_repeat = build_book_chunks(v2_book, chunk_size=32, overlap=8)
+
+    assert v1_chunks and len(v1_chunks) == len(v2_chunks)
+    assert all("-p1-" in chunk.chunk_id for chunk in v1_chunks)
+    assert all("-p2-" in chunk.chunk_id for chunk in v2_chunks)
+    assert [chunk.chunk_id for chunk in v1_chunks] == [chunk.chunk_id for chunk in v1_repeat]
+    assert [chunk.chunk_id for chunk in v1_chunks] != [chunk.chunk_id for chunk in v2_chunks]
+    assert [chunk.chunk_id for chunk in v2_chunks] == [chunk.chunk_id for chunk in v2_repeat]
+    assert all(chunk.text == book.body_text[chunk.start_char:chunk.end_char] for chunk in v1_chunks)
+    assert all(chunk.text == v2_book.body_text[chunk.start_char:chunk.end_char] for chunk in v2_chunks)
 
 
 def test_untrimmed_step_schedule_survives_boundary_whitespace(tmp_path):

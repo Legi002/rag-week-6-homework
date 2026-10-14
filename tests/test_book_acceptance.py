@@ -2,6 +2,8 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
+import sys
 
 import pytest
 
@@ -69,3 +71,20 @@ def test_real_book_cases_at_both_configs_and_limits(real_book, real_indexes, cas
         assert case["category"] == "known_false_refusal"
         assert result.refused
         assert not result.citations
+
+
+def test_real_cli_handles_five_thousand_digit_count_without_traceback(real_book):
+    question = "9" * 5000 + " errors"
+    completed = subprocess.run(
+        [sys.executable, "-m", "src.cli", "--corpus-file", os.environ["RAG_PRINCE_FILE"], "--question", question],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+
+    assert completed.returncode == 0
+    assert "Refused: True" in completed.stdout
+    assert "Citations: None" in completed.stdout
+    assert "Traceback" not in completed.stdout
+    assert "Traceback" not in completed.stderr

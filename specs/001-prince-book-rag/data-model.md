@@ -58,9 +58,11 @@ SentenceSpan stores section key and exact half-open body offsets. Sentence text 
 Identifier format uses only ASCII letters/digits/hyphens:
 
 ```text
-chunk_id = pg1232-{full source_sha256}-p1-c{size}-o{overlap}-{section_id}-w{start}-{end}
-excerpt_id = pg1232-{full source_sha256}-p1-c{size}-o{overlap}-{section_id}-s{start}-{end}
+chunk_id = pg1232-{full source_sha256}-{parser_component}-c{size}-o{overlap}-{section_id}-w{start}-{end}
+excerpt_id = pg1232-{full source_sha256}-{parser_component}-c{size}-o{overlap}-{section_id}-s{start}-{end}
 ```
+
+`parser_component` is derived from the numeric suffix of the parser version: `prince-sections-v1` maps to `p1`, preserving the original identifiers, and `prince-sections-v2` maps to `p2`.
 
 No short digest is used as the identity key. Changing canonical source, parser or chunk configuration changes identifiers; line-ending/BOM equivalents do not. Changing question or top-k does not change chunk IDs. Never reuse one ID for different source slices within a run.
 

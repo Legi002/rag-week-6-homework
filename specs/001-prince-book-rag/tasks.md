@@ -1,7 +1,7 @@
 # Tasks: Local Prince Book Extension
 
 **Input**: spec.md, plan.md, research.md, data-model.md, contracts/, evaluation-cases.json and validation.md in this feature directory.
-**Status**: Implementation in progress; actual results are recorded below.
+**Status**: Original implementation and reviewed follow-up complete; actual results are recorded below.
 **Tests**: Required by FR-011. Add observable-behavior tests before the corresponding new implementation. Preserve inherited checks.
 
 ## Rules for the implementation session
@@ -92,6 +92,22 @@ US1 is the first independently verified increment; US2 adds the useful query pat
 - T026: reviewed against `4c0e2b4`. Inherited `src/corpus.py`, `src/chunking.py`, `src/retrieval.py`, `src/rag.py`, `evidence.md`, and tracked `.venv/` are unchanged. `src/cli.py` is the only modified baseline source module; book behavior is isolated in three new modules.
 - T027: timed the 800/120/k3 five-errors command at 0.376 seconds on Windows host `DURUT` with Python 3.13.7, below the five-second target.
 - T028: reconciled identity, parser, offsets, BM25, admission, citations, CLI, errors and content oracles with both contracts and the plan. Verified raw/source/body fingerprints. The full ebook and temporary evidence generator remain outside Git. Results state the documented false refusal and limitations.
-- T029: all completed task results are recorded. T030 remains pending until the reviewed commit exists.
+- T029: all original implementation task results are recorded.
 - Final review update: the synthetic parser suite explicitly covers contents-list duplicates, outside-license exclusion, duplicate/reversed markers, and reordered chapters. The final full suite remains 132 passed with the real source configured.
-- T030 (2026-10-14): committed reviewed extension changes on eat/extended-rag-homework as 5806b226faa685e6cb2288fdb9622005cf993e32; commit includes only the scoped source, tests, documentation, task results and actual evidence report.
+- T030 (2026-10-14): original implementation and validation committed on `feat/extended-rag-homework` as `e4207045604b1cebfe8736b575d3f433bb0b41dd`; this is the reviewed implementation commit.
+
+## Follow-up review tasks
+
+- [x] T031 Add parser-version regression tests proving chunk and excerpt identifiers change with the parser version, remain stable for identical versions/settings, and resolve to exact source slices.
+- [x] T032 Derive the parser component in chunk and excerpt identifiers from the actual parser version while preserving existing v1 identifiers; clarify identifier documentation.
+- [x] T033 Add answer-API and actual-CLI regression tests for a 5,000-digit numeric question followed by `errors`; require a controlled refusal or documented input error without traceback.
+- [x] T034 Handle oversized numeric counts safely within the conservative policy without truncating question text, weakening numeric specificity, increasing Python's global conversion limit, or broadly catching exceptions.
+- [x] T035 Correct the original task results and record follow-up validation accurately without embedding the follow-up commit hash.
+- [x] T036 Run all inherited and new tests with the verified real book, all 48 acceptance combinations, compatibility checks and the long-number CLI case; commit the scoped changes and finish clean.
+
+- T031: parser-version regression tests first failed against the reviewed implementation, then passed after the fix. Both chunk and excerpt IDs vary between v1/v2, repeat for identical version/settings, and preserve exact canonical source slices.
+- T032: chunk and excerpt IDs now derive `pN` from a trailing `-vN` parser version. The original v1 output retains `p1`; data-model.md documents the mapping.
+- T033: the 5,000-digit `errors` question reproduced the uncaught `ValueError` in both API and actual CLI before the fix. Afterward, API and real-source CLI return `NO_ADMISSIBLE_SENTENCE`, `Refused: True`, and no citations or traceback.
+- T034: count parsing strips leading zeroes, converts only at most four significant digits, and marks larger positive counts for conservative refusal. The complete question and numeric query token remain intact; no global integer limit or broad exception handling changed.
+- T035: corrected T029/T030 records above. The reviewed original implementation commit is `e4207045604b1cebfe8736b575d3f433bb0b41dd`; the follow-up commit hash is intentionally reported outside this file.
+- T036: raw source SHA-256 verified as `33496a305f7a4b933784fb5aec95f920fbc3d4687794817e4cc444aa6578d2e4`; production canonical identity was accepted. Full suite: 136 passed, 0 skipped, 0 failed. Separate acceptance run: 48 passed (16 supported outcomes, 28 expected negative refusals, and 4 known paraphrase false refusals); the long-number actual CLI check passed in the full suite. Real CLI checks preserved v1 `p1` quotation IDs and both ordinary and known-paraphrase refusals with no citations. The follow-up commit contains only these focused source, regression-test, task-result and identifier-documentation changes; its hash is reported in the completion response.

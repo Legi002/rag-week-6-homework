@@ -5,7 +5,7 @@ import re
 from types import MappingProxyType
 from typing import Mapping, Tuple
 
-from .book_corpus import BookCorpus
+from .book_corpus import BookCorpus, parser_id_component
 
 TOKEN_RE = re.compile(r"[a-zA-Z0-9]+")
 BOOK_TOKEN_POLICY_VERSION = "book-lexical-v1"
@@ -103,7 +103,10 @@ def build_book_chunks(book: BookCorpus, chunk_size: int = 800, overlap: int = 12
             while end > start and book.body_text[end - 1].isspace():
                 end -= 1
             if start < end:
-                chunk_id = "pg1232-%s-p1-c%d-o%d-%s-w%d-%d" % (book.source_sha256, chunk_size, overlap, section.section_id, start, end)
+                chunk_id = "pg1232-%s-%s-c%d-o%d-%s-w%d-%d" % (
+                    book.source_sha256, parser_id_component(book.manifest.parser_version),
+                    chunk_size, overlap, section.section_id, start, end,
+                )
                 chunks.append(BookChunk(chunk_id, book.doc_id, section.section_id, section.heading, section.kind,
                                         start, end, book.body_text[start:end], chunk_size, overlap,
                                         book.manifest.parser_version, book.manifest.normalizer_version))
